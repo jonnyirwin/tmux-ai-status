@@ -6,8 +6,9 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$CURRENT_DIR/detect.sh" >/dev/null 2>&1 &
 
+target="${TMUX_PANE:-$(tmux display-message -p '#{pane_id}')}"
 icon="$(tmux show-option -gv '@ai_icon')"
-current="$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}')"
+current="$(tmux display-message -t "$target" -p '#{session_name}:#{window_index}.#{pane_index}')"
 tmux set-option -g "@ai_prev_pane" "$current"
 
 # Filter: non-empty = shown. Each scope uses its own option so nothing is inherited.
@@ -19,4 +20,4 @@ format="#{?pane_format,\
 #{?@ai_window_tool,${icon} ,}#{window_index}: #{window_name}#{window_flags} (#{window_panes}p),\
 #{?@ai_session_tool,${icon} ,}#{session_name}: #{session_windows} windows#{?session_attached, (attached),}}}"
 
-tmux choose-tree -Zw -f "$filter" -F "$format"
+tmux choose-tree -t "$target" -Zw -f "$filter" -F "$format"

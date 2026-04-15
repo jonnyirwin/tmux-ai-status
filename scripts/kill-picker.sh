@@ -7,6 +7,7 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$CURRENT_DIR/detect.sh" >/dev/null 2>&1 &
 
+target="${TMUX_PANE:-$(tmux display-message -p '#{pane_id}')}"
 icon="$(tmux show-option -gv '@ai_icon')"
 
 filter='#{?pane_format,#{@ai_pane_tool},#{?window_format,#{@ai_window_tool},#{@ai_session_tool}}}'
@@ -19,5 +20,5 @@ format="#{?pane_format,\
 
 # %% expands to the selected target (session:window.pane or similar).
 # run-shell runs our kill-ai script against it.
-tmux choose-tree -Zw -f "$filter" -F "$format" \
+tmux choose-tree -t "$target" -Zw -f "$filter" -F "$format" \
     "run-shell \"$CURRENT_DIR/kill-ai.sh '%%'\""
