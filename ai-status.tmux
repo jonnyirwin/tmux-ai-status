@@ -58,25 +58,11 @@ tmux set-option -g "@ai_refresh_interval" "$interval"
 "$SCRIPTS_DIR/daemon.sh" start >/dev/null 2>&1 &
 
 # Visual markers — prepend icon to window status and pane border title when AI present.
-# Store originals once so re-sourcing doesn't nest markers.
-if [ -z "$(tmux show-option -gqv '@ai_orig_window_status_format')" ]; then
-    tmux set-option -g "@ai_orig_window_status_format" "$(tmux show-option -gv window-status-format)"
-    tmux set-option -g "@ai_orig_window_status_current_format" "$(tmux show-option -gv window-status-current-format)"
-    tmux set-option -g "@ai_orig_pane_border_format" "$(tmux show-option -gv pane-border-format)"
-fi
+# Idempotent: checks for the sentinel so re-sourcing doesn't nest markers,
+# and re-applies via hooks in case other plugins (TPM, themes) overwrite formats.
+"$SCRIPTS_DIR/apply-markers.sh"
 
-orig_ws="$(tmux show-option -gv '@ai_orig_window_status_format')"
-orig_wsc="$(tmux show-option -gv '@ai_orig_window_status_current_format')"
-orig_pbf="$(tmux show-option -gv '@ai_orig_pane_border_format')"
-
-# Color switches to idle when no pane in the window/session is currently active.
-win_color="#[fg=#{?@ai_window_active,${active_color},${idle_color}}]"
-pane_color="#[fg=#{?@ai_pane_active,${active_color},${idle_color}}]"
-win_marker='#{?@ai_window_tool,'"${win_color}${icon}"' #[default],}'
-pane_marker='#{?@ai_pane_tool, '"${pane_color}${icon}"' #{@ai_pane_tool}#[default],}'
-tmux set-option -g window-status-format "${win_marker}${orig_ws}"
-tmux set-option -g window-status-current-format "${win_marker}${orig_wsc}"
-tmux set-option -g pane-border-format "${orig_pbf}${pane_marker}"
+tmux set-hook -g client-attached "run-shell -b '$SCRIPTS_DIR/apply-markers.sh'"
 
 # Initial scan.
 "$SCRIPTS_DIR/detect.sh"

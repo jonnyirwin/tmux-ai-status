@@ -84,3 +84,10 @@ while read -r session; do
 done < <(tmux list-sessions -F '#{session_name}')
 
 tmux set-option -g "@ai_total" "$total" 2>/dev/null
+
+# Re-apply marker formats in case another plugin/theme overwrote them.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/apply-markers.sh" 2>/dev/null
+
+# Force status-line redraw so updated counts/markers appear immediately.
+tmux refresh-client -S 2>/dev/null

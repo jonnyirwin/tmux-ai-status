@@ -13,7 +13,7 @@ case "${1:-start}" in
             exit 0
         fi
         (
-            echo $$ > "$PID_FILE"
+            echo "$BASHPID" > "$PID_FILE"
             trap 'rm -f "$PID_FILE"; exit' TERM INT EXIT
             while tmux has-session 2>/dev/null; do
                 interval="$(tmux show-option -gqv '@ai_refresh_interval')"
