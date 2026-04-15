@@ -23,7 +23,7 @@ Find and jump between tmux panes running **Claude Code** or **GitHub Copilot CLI
 With [TPM](https://github.com/tmux-plugins/tpm):
 
 ```tmux
-set -g @plugin 'jonny/tmux-ai-status'
+set -g @plugin 'jonnyirwin/tmux-ai-status'
 ```
 
 Or manually:
