@@ -4,7 +4,7 @@
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$CURRENT_DIR/detect.sh"
+"$CURRENT_DIR/detect.sh" >/dev/null 2>&1 &
 
 icon="$(tmux show-option -gv '@ai_icon')"
 current="$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}')"
